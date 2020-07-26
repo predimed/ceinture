@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ceinture/features/launcher/presentation/pages/bluetooth_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/hom_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ceinture/core/utils/colors.dart';

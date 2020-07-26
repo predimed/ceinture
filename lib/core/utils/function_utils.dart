@@ -15,6 +15,10 @@ class FunctionUtils {
     return sum & 0xFF;
   }
 
+  static int representCharInHex(String number) {
+    return int.parse('0X${number}');
+  }
+
   static int representIntInHex(int number) {
     return int.parse('0X${number}');
   }

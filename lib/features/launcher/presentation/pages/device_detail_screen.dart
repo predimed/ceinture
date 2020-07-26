@@ -197,7 +197,7 @@ class PageState extends State<DeviceDetailScreen> {
       Future.delayed(new Duration(milliseconds: 2000));
       if (_ceintureSensorRepository == null) {
         _ceintureSensorRepository =
-            new CeintureSensorRepository(bleDeviceConnector);
+            new CeintureSensorRepository(bleDeviceConnector:bleDeviceConnector);
       }
       _ceintureSensorRepository.executeCommand(
           "${widget.device.id}", CeintureCommand.getTime());

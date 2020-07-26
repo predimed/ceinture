@@ -1,5 +1,14 @@
 {
-  "app_name": "Ceinture",
+  "app_name": "Ceinture Config",
   "menu_my_measure": "Mes mesures",
-  "menu_useful_number": "Numéros utiles"
+  "menu_useful_number": "Numéros utiles",
+  "message_device_is_connected": "Connexion etablie avec succès ",
+  "message_wifi_update_success": "Le nom du wifi a été bien mise à jour ",
+  "message_time_update_success": "La date a été bien mise à jour ",
+  "message_command_fail": "Une erreur s'est produite durant l'excution de la commande ",
+  "message_wifi_password_update_success": "Le mot de passe du wifi a été bien mise à jour ",
+  "message_connection_success": "Le WIFI est connecté ",
+  "message_connection_fail": "Echec de connexion au WIFI "
+
+
 }
