@@ -25,6 +25,7 @@ class PageState extends State<WifiPasswordPage> {
   String _wifiName;
   BuildContext _buildContext;
   BuildContext _dialogContext;
+  bool isProgress = false;
 
   CeintureSensorRepository _ceintureSensorRepository;
 
@@ -37,6 +38,9 @@ class PageState extends State<WifiPasswordPage> {
         case 'message_wifi_password_update_success':
         //Navigator.pop(_buildContext);
         //Navigator.of(_buildContext).pop();
+        setState(() {
+          isProgress = false;
+        });
           Toast.show("${translationsUtils.text(event)}", _buildContext,
               duration: 4, gravity: Toast.BOTTOM);
           break;
@@ -47,6 +51,9 @@ class PageState extends State<WifiPasswordPage> {
 
 
   void updateWifiPassword() async {
+    setState(() {
+      isProgress = true;
+    });
     await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
         CeintureCommand.setWifiPassword(_wifiName), widget.isConnected);
   }
@@ -137,6 +144,19 @@ class PageState extends State<WifiPasswordPage> {
                     ),
                   ),
                 ),
+                (isProgress)?Container(
+                    child: AlertDialog(
+                        content: new Row(
+                          children: [
+                            CircularProgressIndicator(),
+                            Container(
+                                margin: EdgeInsets.all( 20),
+                                child: Text(
+                                  "Veuillez patienter...",
+                                  style: TextStyle(fontSize: 14),
+                                )),
+                          ],
+                        ))):Container()
               ],
             ),
             ),

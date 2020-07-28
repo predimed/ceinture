@@ -25,6 +25,7 @@ class PageState extends State<WifiNamePage> {
   String _wifiName;
   BuildContext _buildContext;
   BuildContext _dialogContext;
+  bool isProgress = false;
 
   CeintureSensorRepository _ceintureSensorRepository;
 
@@ -37,8 +38,12 @@ class PageState extends State<WifiNamePage> {
         case 'message_wifi_update_success':
         //Navigator.pop(_buildContext);
         //Navigator.of(_buildContext).pop();
+        setState(() {
+          isProgress = false;
+        });
           Toast.show("${translationsUtils.text(event)}", _buildContext,
               duration: 4, gravity: Toast.BOTTOM);
+
           break;
       }
     });
@@ -49,6 +54,9 @@ class PageState extends State<WifiNamePage> {
 
   void updateWifiNameValidate() async {
     print("mon dialog, tu as quoi==================");
+    setState(() {
+      isProgress = true;
+    });
     //String name = "didierccccccccccccccc";
     if (_wifiName.length <= 14) {
       await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
@@ -146,6 +154,19 @@ class PageState extends State<WifiNamePage> {
                     ),
                   ),
                 ),
+                (isProgress)?Container(
+                    child: AlertDialog(
+                        content: new Row(
+                          children: [
+                            CircularProgressIndicator(),
+                            Container(
+                                margin: EdgeInsets.all( 20),
+                                child: Text(
+                                  "Veuillez patienter...",
+                                  style: TextStyle(fontSize: 14),
+                                )),
+                          ],
+                        ))):Container()
               ],
             ),
             ),
@@ -153,34 +174,6 @@ class PageState extends State<WifiNamePage> {
         ));
   }
 
-  showLoaderDialog(){
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          _dialogContext = context;
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text("Veuillez patienterok..."),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(primaryColor),
-                )
-              ],
-            ),
-          );
-        });
-
-    //Navigator.of(context).pop();
-
-
-  }
 }
 
 class MyTextFormField extends StatelessWidget {

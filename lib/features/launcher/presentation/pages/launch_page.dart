@@ -4,7 +4,6 @@ import 'package:ceinture/features/launcher/presentation/pages/hom_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/utils.dart';
-import 'package:ceinture/features/launcher/presentation/pages/root_page.dart';
 
 
 class SplashPage extends StatefulWidget {

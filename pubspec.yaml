@@ -42,6 +42,7 @@ dependencies:
   flutter_bluetooth_basic: ^0.1.5
   rxdart:
   auto_size_text: ^2.1.0
+  #progress-state-button:
 
 dev_dependencies:
   flutter_test:

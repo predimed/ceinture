@@ -87,7 +87,8 @@ class FindDevicesScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            FlutterBlue.instance.startScan(withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
+            //FlutterBlue.instance.startScan(withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
+            FlutterBlue.instance.startScan(
                 timeout: Duration(seconds: 4)),
         child: SingleChildScrollView(
           child: Column(
@@ -97,7 +98,8 @@ class FindDevicesScreen extends StatelessWidget {
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),
                 initialData: [],
                 builder: (c, snapshot) => Column(
-                  children: snapshot.data.where((element) => element.type==BluetoothDeviceType.le)
+                  children: snapshot.data.where((element) => (element.type==BluetoothDeviceType.le
+                      && element.name?.toLowerCase()?.startsWith("j")))
                       .map((d) =>  GestureDetector(
                     onTap: () async {
                       //widget.stopScan();
@@ -165,7 +167,8 @@ class FindDevicesScreen extends StatelessWidget {
                 stream: FlutterBlue.instance.scanResults,
                 initialData: [],
                 builder: (c, snapshot) => Column(
-                  children: snapshot.data.where((element) => element.device.type == BluetoothDeviceType.le)
+                  children: snapshot.data.where((element) => (element.device.type == BluetoothDeviceType.le
+                      && element.device.name?.toLowerCase()?.startsWith("j")))
                       .map(
                         (r) {
                           print("the data ==========###################      ${r.advertisementData.toString().toString()}");
@@ -256,7 +259,8 @@ class FindDevicesScreen extends StatelessWidget {
                   color: primaryColor,
                 ),
                 onPressed: () => FlutterBlue.instance
-                    .startScan( withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
+                    //.startScan( withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
+                    .startScan(
                     timeout: Duration(seconds: 4)));
           }
         },

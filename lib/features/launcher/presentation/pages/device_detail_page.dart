@@ -9,14 +9,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:toast/toast.dart';
 
-class DeviceDetailPage extends StatelessWidget {
+class DeviceDetailPage extends StatefulWidget {
   final BluetoothDevice device;
 
   DeviceDetailPage({@required this.device}) : assert(device != null);
+  @override
+  PageState createState() => PageState();
+}
+
+
+  class PageState extends State<DeviceDetailPage> {
 
   bool loadingConnexion = false;
   bool loadingTime = false;
   bool isConnected = false;
+  bool isProgress = false;
   BluetoothDeviceState _bluetoothDeviceState;
   CeintureSensorRepository _ceintureSensorRepository;
   final _formKey = GlobalKey<FormState>();
@@ -26,7 +33,7 @@ class DeviceDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _buildContext = context;
-    _ceintureSensorRepository = CeintureSensorRepository(device: device);
+    _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
       switch (event) {
         case 'message_command_fail':
@@ -37,12 +44,15 @@ class DeviceDetailPage extends StatelessWidget {
         case 'message_connection_fail':
           Toast.show("${translationsUtils.text(event)}", context,
               duration: 5, gravity: Toast.BOTTOM);
+          setState(() {
+            isProgress = false;
+          });
           break;
       }
     });
 
     return WillPopScope(
-     /* onWillPop: () async {
+      /* onWillPop: () async {
         //disconnect(device.id);
         return true;
       },*/
@@ -53,7 +63,7 @@ class DeviceDetailPage extends StatelessWidget {
             children: <Widget>[
               Expanded(
                   child: Text(
-                device.name.toString() ?? "unknow",
+                    widget.device.name.toString() ?? "unknow",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22),
               )),
@@ -64,13 +74,15 @@ class DeviceDetailPage extends StatelessWidget {
         ),
         body: Center(
           child: StreamBuilder<BluetoothDeviceState>(
-            stream: device.state,
+            stream: widget.device.state,
             initialData: BluetoothDeviceState.connecting,
             builder: (c, snapshot) {
               loadingConnexion = false;
               if (snapshot.data == BluetoothDeviceState.connected) {
                 isConnected = true;
+                //isProgress = false;
               } else {
+                //isProgress = false;
                 isConnected = false;
               }
               return Column(
@@ -119,10 +131,25 @@ class DeviceDetailPage extends StatelessWidget {
                         ),
                         onPressed: () => connectDevice(context),
                       )),
-                  btnCommand(context, "Mettre à jour la date", updateDate),
-                  btnCommand( context, "Mettre à jour le nom du WIFI", updateWifiName),
-                  btnCommand(context, "Mettre à jour le mot de passe du WIFI", updateWifiPassword),
-                  btnCommand(context, "Etat du WIFI", wifiStatus),
+                  (isConnected)?btnCommand(context, "Mettre à jour la date", updateDate):Container(),
+                  (isConnected)?btnCommand(
+                      context, "Mettre à jour le nom du WIFI", updateWifiName):Container(),
+                  (isConnected)?btnCommand(context, "Mettre à jour le mot de passe du WIFI",
+                      updateWifiPassword):Container(),
+                  (isConnected)?btnCommand(context, "Etat du WIFI", wifiStatus):Container(),
+                  (isProgress)?Container(
+                      child: AlertDialog(
+                          content: new Row(
+                    children: [
+                      CircularProgressIndicator(),
+                      Container(
+                          margin: EdgeInsets.all( 20),
+                          child: Text(
+                            "Veuillez patienter...",
+                            style: TextStyle(fontSize: 14),
+                          )),
+                    ],
+                  ))):Container()
                 ],
               );
             },
@@ -181,29 +208,48 @@ class DeviceDetailPage extends StatelessWidget {
 
   void connectDevice(BuildContext context) async {
     loadingConnexion = true;
+    setState(() {
+      isProgress = true;
+    });
     if (!isConnected) {
-      await device.connect().then((value) {});
+      await widget.device.connect().then((value) {
+        setState(() {
+          isProgress = false;
+        });
+      });
     } else {
-      await device.disconnect().then((value) {});
+      await widget.device.disconnect().then((value) {
+        setState(() {
+          isProgress = false;
+        });
+      });
     }
   }
 
   void updateDate() async {
+    setState(() {
+      isProgress = true;
+    });
     await _ceintureSensorRepository.executeBleCommand(
-        device.id.id, CeintureCommand.setTime(), isConnected);
+        widget.device.id.id, CeintureCommand.setTime(), isConnected);
   }
 
   void wifiStatus() async {
+    setState(() {
+      isProgress = true;
+    });
     await _ceintureSensorRepository.executeBleCommand(
-        device.id.id, CeintureCommand.getConnectionStatus(), isConnected);
+        widget.device.id.id, CeintureCommand.getConnectionStatus(), isConnected);
   }
 
   void updateWifiPassword() async {
     await Navigator.push<void>(
         _buildContext,
         MaterialPageRoute(
-            builder: (context) =>
-                WifiPasswordPage(device: device, isConnected: isConnected,)));
+            builder: (context) => WifiPasswordPage(
+                  device: widget.device,
+                  isConnected: isConnected,
+                )));
   }
 
   void updateWifiName() async {
@@ -214,17 +260,19 @@ class DeviceDetailPage extends StatelessWidget {
     await Navigator.push<void>(
         _buildContext,
         MaterialPageRoute(
-            builder: (context) =>
-                WifiNamePage(device: device, isConnected: isConnected,)));
+            builder: (context) => WifiNamePage(
+                  device: widget.device,
+                  isConnected: isConnected,
+                )));
   }
 
   void updateWifiNameValidate() async {
     //String name = "didierccccccccccccccc";
     if (_wifiName.length <= 14) {
-      await _ceintureSensorRepository.executeBleCommand(device.id.id,
+      await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
           CeintureCommand.setWifiNameLessThan14(_wifiName), isConnected);
     } else {
-      await _ceintureSensorRepository.executeBleCommand(device.id.id,
+      await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
           CeintureCommand.setWifiNameLessThan14(_wifiName), isConnected,
           commandList: CeintureCommand.setWifiNameGreatThan14(_wifiName));
     }
@@ -238,7 +286,7 @@ class DeviceDetailPage extends StatelessWidget {
         return SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Container(
-                padding: EdgeInsets.all( 20),
+                padding: EdgeInsets.all(20),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -320,7 +368,10 @@ class DeviceDetailPage extends StatelessWidget {
           CircularProgressIndicator(),
           Container(
               margin: EdgeInsets.only(left: 7),
-              child: Text("Nous sommes en chemin...", style: TextStyle(fontSize: 12),)),
+              child: Text(
+                "Nous sommes en chemin...",
+                style: TextStyle(fontSize: 12),
+              )),
         ],
       ),
     );
