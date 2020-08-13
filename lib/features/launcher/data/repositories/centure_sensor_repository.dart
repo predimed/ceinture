@@ -131,15 +131,22 @@ class CeintureSensorRepository {
           print(
               "voici le resultat avant controle=====================  :   ${data.toString()}");
           if (data != null &&
-              !data.isEmpty &&
-              data[1].toRadixString(16) == 01.toRadixString(16)) {
+              !data.isEmpty) {
             print(
                 "voici le resultat=====================  :   ${data.toString()}");
             data.forEach((element) {
               print(
                   "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
             });
-            _subjectCounter.sink.add("message_connection_success");
+            if ((data[1].toRadixString(16) == 01.toRadixString(16)) && (data[2].toRadixString(16) == 01.toRadixString(16))) {
+              _subjectCounter.sink.add("message_connection_success");
+            }else
+            if (data[1].toRadixString(16) == 01.toRadixString(16)) {
+              _subjectCounter.sink.add("message_connection_wifi_success");
+            }else
+            if (data[2].toRadixString(16) == 01.toRadixString(16)) {
+              _subjectCounter.sink.add("message_connection_server_success");
+            }
           }else{
             _subjectCounter.sink.add("message_connection_fail");
           }
@@ -184,6 +191,36 @@ class CeintureSensorRepository {
             });
             //Toast.show("", context)
             _subjectCounter.sink.add("message_wifi_password_update_success");
+            return true;
+          }
+          break;
+        case CeintureCommand.CMD_SET_SERVER_IP_ADDRESS:
+          if (data != null &&
+              !data.isEmpty &&
+              data.first.toRadixString(16) == 09.toRadixString(16)) {
+            print(
+                "voici le resultat=====================  :   ${data.toString()}");
+            data.forEach((element) {
+              print(
+                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
+            });
+            //Toast.show("", context)
+            _subjectCounter.sink.add("message_server_ip_adress_update_success");
+            return true;
+          }
+          break;
+        case CeintureCommand.CMD_SET_SERVER_PORT:
+          if (data != null &&
+              !data.isEmpty &&
+              data[1].toRadixString(16) == 0.toRadixString(16)) {
+            print(
+                "voici le resultat=====================  :   ${data.toString()}");
+            data.forEach((element) {
+              print(
+                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
+            });
+            //Toast.show("", context)
+            _subjectCounter.sink.add("message_server_port_update_success");
             return true;
           }
           break;

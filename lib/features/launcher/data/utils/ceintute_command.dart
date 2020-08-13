@@ -10,6 +10,8 @@ import 'package:ceinture/core/utils/function_utils.dart';
 class CeintureCommand {
   static const int CMD_SET_WIFI_NAME = 0x06;
   static const int CMD_SET_WIFI_PASSWORD = 0x07;
+  static const int CMD_SET_SERVER_IP_ADDRESS = 0x09;
+  static const int CMD_SET_SERVER_PORT = 0x0a;
   static const int CMD_GET_DATA = 0x43;
   static const int CMD_GET_TIME = 0x41;
   static const int CMD_VIBRATE = 0x36;
@@ -124,8 +126,8 @@ class CeintureCommand {
     for (int i = 0; i < (14-name.length); i++) {
       command.add(0);
     }
-    //command.add(FunctionUtils.getChecksum(command, 15));
-    command.add(FunctionUtils.representIntInHex(71));
+    command.add(FunctionUtils.getChecksum(command, 15));
+    //command.add(FunctionUtils.representIntInHex(71));
     return command;
   }
 
@@ -213,5 +215,41 @@ class CeintureCommand {
     commandFinal.add(command);
     commandFinal.add(command2);
     return commandFinal;
+  }
+
+
+  /**
+   * bon a savoir
+   */
+  //https://www.scadacore.com/tools/programming-calculators/online-checksum-calculator/
+  static List<int> setServerIpAdress(String ipAdress) {
+    List<int> command = [];
+    command.add(CMD_SET_SERVER_IP_ADDRESS);
+    int cpt=14;
+    for (int i = 0; i < ipAdress.length; i++) {
+      command.add((ipAdress.codeUnitAt(i)));
+    }
+    //
+    for (int i = 0; i < (14-ipAdress.length); i++) {
+      command.add(00);
+    }
+    command.add((0x100)-FunctionUtils.getChecksum(command, 15));
+    return command;
+  }
+
+  static List<int> setServerPort(String port) {
+    List<int> command = [];
+    command.add(CMD_SET_SERVER_PORT);
+    command.add(port.length);
+    int cpt=13;
+    for (int i = 0; i < port.length; i++) {
+      command.add((port.codeUnitAt(i)));
+    }
+    //
+    for (int i = 0; i < (13-port.length); i++) {
+      command.add(00);
+    }
+    command.add((0x100)-FunctionUtils.getChecksum(command, 15));
+    return command;
   }
 }

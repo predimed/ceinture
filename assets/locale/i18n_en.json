@@ -7,8 +7,11 @@
   "message_time_update_success": "La date a été bien mise à jour ",
   "message_command_fail": "Une erreur s'est produite durant l'excution de la commande ",
   "message_wifi_password_update_success": "Le mot de passe du wifi a été bien mise à jour ",
-  "message_connection_success": "Le WIFI est connecté ",
-  "message_connection_fail": "Echec de connexion au WIFI "
-
+  "message_connection_success": "La ceinture est connectée au WIFI et au Serveur ",
+  "message_connection_fail": "Echec de connexion au WIFI ",
+  "message_server_ip_adress_update_success": "L'addresse IP du serveur à été bien mise à jour ",
+  "message_server_port_update_success": "Le port du serveur à été bien mise à jour ",
+  "message_connection_wifi_success": "La ceinture est connectée au WIFI ",
+  "message_connection_server_success": "La ceinture est connectée au Serveur  "
 
 }

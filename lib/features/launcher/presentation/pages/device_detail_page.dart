@@ -2,6 +2,8 @@ import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
+import 'package:ceinture/features/launcher/presentation/pages/server_ip_adress_page.dart';
+import 'package:ceinture/features/launcher/presentation/pages/server_port_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/wifi_name_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/wifi_password_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,6 +43,8 @@ class DeviceDetailPage extends StatefulWidget {
         case 'message_wifi_update_success':
         case 'message_wifi_password_update_success':
         case 'message_connection_success':
+        case 'message_connection_server_success':
+        case 'message_connection_wifi_success':
         case 'message_connection_fail':
           Toast.show("${translationsUtils.text(event)}", context,
               duration: 5, gravity: Toast.BOTTOM);
@@ -85,72 +89,79 @@ class DeviceDetailPage extends StatefulWidget {
                 //isProgress = false;
                 isConnected = false;
               }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.only(
-                          left: 20, right: 20, top: 10, bottom: 10),
-                      color: (isConnected) ? selectMenuColor : primaryColor,
-                      child: MaterialButton(
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 1,
-                              child: SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: (loadingConnexion)
-                                    ? CircularProgressIndicator(
-                                        valueColor:
-                                            new AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                      )
-                                    : Container(),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 8,
-                              child: Text(
-                                (isConnected) ? 'Deconnexion' : "Connexion",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: SizedBox(
-                                height: 30,
-                                width: 30,
-                              ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () => connectDevice(context),
-                      )),
-                  (isConnected)?btnCommand(context, "Mettre à jour la date", updateDate):Container(),
-                  (isConnected)?btnCommand(
-                      context, "Mettre à jour le nom du WIFI", updateWifiName):Container(),
-                  (isConnected)?btnCommand(context, "Mettre à jour le mot de passe du WIFI",
-                      updateWifiPassword):Container(),
-                  (isConnected)?btnCommand(context, "Etat du WIFI", wifiStatus):Container(),
-                  (isProgress)?Container(
-                      child: AlertDialog(
-                          content: new Row(
-                    children: [
-                      CircularProgressIndicator(),
+              return SingleChildScrollView(
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
                       Container(
-                          margin: EdgeInsets.all( 20),
-                          child: Text(
-                            "Veuillez patienter...",
-                            style: TextStyle(fontSize: 14),
+                          margin: EdgeInsets.only(
+                              left: 20, right: 20, top: 10, bottom: 10),
+                          color: (isConnected) ? selectMenuColor : primaryColor,
+                          child: MaterialButton(
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    height: 30,
+                                    width: 30,
+                                    child: (loadingConnexion)
+                                        ? CircularProgressIndicator(
+                                      valueColor:
+                                      new AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    )
+                                        : Container(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 8,
+                                  child: Text(
+                                    (isConnected) ? 'Deconnexion' : "Connexion",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onPressed: () => connectDevice(context),
                           )),
+                      (isProgress)?Container(
+                          child: AlertDialog(
+                              content: new Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  Container(
+                                      margin: EdgeInsets.all( 20),
+                                      child: Text(
+                                        "Veuillez patienter...",
+                                        style: TextStyle(fontSize: 14),
+                                      )),
+                                ],
+                              ))):Container(),
+                      (isConnected)?btnCommand(context, "Mettre à jour la date", updateDate):Container(),
+                      (isConnected)?btnCommand(
+                          context, "Mettre à jour le nom du WIFI", updateWifiName):Container(),
+                      (isConnected)?btnCommand(context, "Mettre à jour le mot de passe du WIFI",
+                          updateWifiPassword):Container(),
+                      (isConnected)?btnCommand(context, "Addresse IP du serveur", serverIpAddress):Container(),
+                      (isConnected)?btnCommand(context, "Port du serveur", serverPort):Container(),
+                      (isConnected)?btnCommand(context, "Status de la ceinture", wifiStatus):Container(),
+
                     ],
-                  ))):Container()
-                ],
+                  ),
+                ),
               );
             },
           ),
@@ -247,6 +258,26 @@ class DeviceDetailPage extends StatefulWidget {
         _buildContext,
         MaterialPageRoute(
             builder: (context) => WifiPasswordPage(
+                  device: widget.device,
+                  isConnected: isConnected,
+                )));
+  }
+
+  void serverIpAddress() async {
+    await Navigator.push<void>(
+        _buildContext,
+        MaterialPageRoute(
+            builder: (context) => ServerIpAdressPage(
+                  device: widget.device,
+                  isConnected: isConnected,
+                )));
+  }
+
+  void serverPort() async {
+    await Navigator.push<void>(
+        _buildContext,
+        MaterialPageRoute(
+            builder: (context) => ServerPortPage(
                   device: widget.device,
                   isConnected: isConnected,
                 )));

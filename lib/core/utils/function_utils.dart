@@ -16,11 +16,13 @@ class FunctionUtils {
   }
 
   static int representCharInHex(String number) {
-    return int.parse('0X${number}');
+    return int.parse('0x${number}');
   }
 
   static int representIntInHex(int number) {
-    return int.parse('0X${number}');
+     int x =  int.parse('0x${number}');
+     print('la conversion int en hexa======================== ${number}========= ${x}');
+     return x;
   }
 
   static int representHexInInt(int number) {
