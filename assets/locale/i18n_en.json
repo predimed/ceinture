@@ -12,6 +12,8 @@
   "message_server_ip_adress_update_success": "L'addresse IP du serveur à été bien mise à jour ",
   "message_server_port_update_success": "Le port du serveur à été bien mise à jour ",
   "message_connection_wifi_success": "La ceinture est connectée au WIFI ",
-  "message_connection_server_success": "La ceinture est connectée au Serveur  "
+  "message_connection_server_success": "La ceinture est connectée au Serveur  ",
+  "message_real_time_is_stop": "Le monitoring par defaut est bien arreté ",
+  "message_ceintur_update_success": "Le nom de la ceinture a été bien mise à jour"
 
 }

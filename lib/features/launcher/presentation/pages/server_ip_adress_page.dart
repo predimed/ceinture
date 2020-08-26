@@ -42,7 +42,7 @@ class PageState extends State<ServerIpAdressPage> {
           isProgress = false;
         });
           Toast.show("${translationsUtils.text(event)}", _buildContext,
-              duration: 4, gravity: Toast.BOTTOM);
+              duration: 4, gravity: Toast.TOP);
 
           break;
       }

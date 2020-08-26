@@ -121,23 +121,10 @@ class CeintureSensorRepository {
           "voici les entete commande  en hexa  que je veux ####################### :   ${data[0]}");
       switch ((data[0])) {
         case CeintureCommand.CMD_VIBRATE:
-          data.forEach((element) {
-            print(
-                "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
-          });
           break;
 
         case CeintureCommand.CMD_GET_CONNECTION_STATUS:
-          print(
-              "voici le resultat avant controle=====================  :   ${data.toString()}");
-          if (data != null &&
-              !data.isEmpty) {
-            print(
-                "voici le resultat=====================  :   ${data.toString()}");
-            data.forEach((element) {
-              print(
-                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
-            });
+          if (data != null && !data.isEmpty) {
             if ((data[1].toRadixString(16) == 01.toRadixString(16)) && (data[2].toRadixString(16) == 01.toRadixString(16))) {
               _subjectCounter.sink.add("message_connection_success");
             }else
@@ -153,12 +140,6 @@ class CeintureSensorRepository {
           break;
 
         case CeintureCommand.CMD_SET_TIME:
-          print(
-              "voici le resultat=====================  :   ${data.toString()}");
-          data.forEach((element) {
-            print(
-                "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
-          });
           _subjectCounter.sink.add("message_time_update_success");
           return true;
           break;
@@ -167,14 +148,16 @@ class CeintureSensorRepository {
           if (data != null &&
               !data.isEmpty &&
               data.first.toRadixString(16) != 26.toRadixString(16)) {
-            print(
-                "voici le resultat=====================  :   ${data.toString()}");
-            data.forEach((element) {
-              print(
-                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
-            });
-            //Toast.show("", context)
             _subjectCounter.sink.add("message_wifi_update_success");
+            return true;
+          }
+          break;
+
+        case CeintureCommand.CMD_REAL_TIME:
+          if (data != null &&
+              !data.isEmpty &&
+              data.first.toRadixString(16) == 11.toRadixString(10)) {
+            _subjectCounter.sink.add("message_real_time_is_stop");
             return true;
           }
           break;
@@ -183,13 +166,6 @@ class CeintureSensorRepository {
           if (data != null &&
               !data.isEmpty &&
               data.first.toRadixString(16) == 07.toRadixString(16)) {
-            print(
-                "voici le resultat=====================  :   ${data.toString()}");
-            data.forEach((element) {
-              print(
-                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
-            });
-            //Toast.show("", context)
             _subjectCounter.sink.add("message_wifi_password_update_success");
             return true;
           }
@@ -221,6 +197,21 @@ class CeintureSensorRepository {
             });
             //Toast.show("", context)
             _subjectCounter.sink.add("message_server_port_update_success");
+            return true;
+          }
+          break;
+        case CeintureCommand.CMD_SET_DEVICE_NAME:
+          if (data != null &&
+              !data.isEmpty &&
+              data[0].toRadixString(16).toLowerCase() == "3D".toLowerCase()) {
+            print(
+                "voici le resultat=====================  :   ${data.toString()}");
+            data.forEach((element) {
+              print(
+                  "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
+            });
+            //Toast.show("", context)
+            _subjectCounter.sink.add("message_ceintur_update_success");
             return true;
           }
           break;

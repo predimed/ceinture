@@ -9,20 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:toast/toast.dart';
 
-class ServerPortPage extends StatefulWidget {
+class DeviceNamePage extends StatefulWidget {
 
   final BluetoothDevice device;
   final isConnected;
-  ServerPortPage({@required this.device, this.isConnected}) : assert(device != null);
+  DeviceNamePage({@required this.device, this.isConnected}) : assert(device != null);
 
   @override
   PageState createState() => PageState();
 }
 
-class PageState extends State<ServerPortPage> {
+class PageState extends State<DeviceNamePage> {
   List<bool> selectionList = List.generate(2, (_) => false);
   final _formKey = GlobalKey<FormState>();
-  String serverPort;
+  String _wifiName;
   BuildContext _buildContext;
   BuildContext _dialogContext;
   bool isProgress = false;
@@ -35,7 +35,7 @@ class PageState extends State<ServerPortPage> {
     _ceintureSensorRepository.counterObservable.listen((event) {
       switch (event) {
         case 'message_command_fail':
-        case 'message_server_port_update_success':
+        case 'message_ceintur_update_success':
         //Navigator.pop(_buildContext);
         //Navigator.of(_buildContext).pop();
         setState(() {
@@ -52,13 +52,18 @@ class PageState extends State<ServerPortPage> {
 
 
 
-  void updateServerPortValidate() async {
+  void updateCeintureNameValidate() async {
+    print("mon dialog, tu as quoi==================");
     setState(() {
       isProgress = true;
     });
-    if (serverPort.length <= 14) {
+    //String name = "didierccccccccccccccc";
+    if (_wifiName.length <= 14) {
       await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
-          CeintureCommand.setServerPort(serverPort), widget.isConnected);
+          CeintureCommand.setDeviceName(_wifiName), widget.isConnected);
+    } else{
+      Toast.show("Veuillez entrer un nom dont la longeur est inferieure à 14 caractère", _buildContext,
+          duration: 5, gravity: Toast.TOP);
     }
   }
 
@@ -89,16 +94,15 @@ class PageState extends State<ServerPortPage> {
                 Container(
                   padding: EdgeInsets.all(20),
                   child: Text(
-                    "Configuration du Serveur !",
+                    "Configuration du nom de la ceinture !",
                     style: TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 MyTextFormField(
-                  hintText: 'Port du serveur',
-                  initialValue: '9876',
-                  isNumber: true,
+                  hintText: 'Nom de la ceinture',
+                  initialValue: '',
                   validator: (String value) {
                     if (value.length < 1) {
                       return "Veuillez renseigner votre ce champs";
@@ -107,7 +111,7 @@ class PageState extends State<ServerPortPage> {
                     return null;
                   },
                   onSaved: (String value) {
-                    serverPort = value;
+                    _wifiName = value;
                   },
                 ),
                 SizedBox(
@@ -118,7 +122,7 @@ class PageState extends State<ServerPortPage> {
                     //setState(() {
                     if (_formKey.currentState.validate()) {
                       //showLoaderDialog();
-                      updateServerPortValidate();
+                      updateCeintureNameValidate();
                     }
                     //});
                   },
@@ -202,6 +206,7 @@ class MyTextFormField extends StatelessWidget {
           filled: true,
           fillColor: Colors.grey[200],
         ),
+        maxLength: 14,
         obscureText: isPassword ? true : false,
         validator: validator,
         onSaved: onSaved,

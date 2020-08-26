@@ -2,6 +2,7 @@ import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
+import 'package:ceinture/features/launcher/presentation/pages/device_name_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/server_ip_adress_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/server_port_page.dart';
 import 'package:ceinture/features/launcher/presentation/pages/wifi_name_page.dart';
@@ -45,9 +46,10 @@ class DeviceDetailPage extends StatefulWidget {
         case 'message_connection_success':
         case 'message_connection_server_success':
         case 'message_connection_wifi_success':
+        case 'message_real_time_is_stop':
         case 'message_connection_fail':
           Toast.show("${translationsUtils.text(event)}", context,
-              duration: 5, gravity: Toast.BOTTOM);
+              duration: 5, gravity: Toast.TOP);
           setState(() {
             isProgress = false;
           });
@@ -151,12 +153,14 @@ class DeviceDetailPage extends StatefulWidget {
                                 ],
                               ))):Container(),
                       (isConnected)?btnCommand(context, "Mettre à jour la date", updateDate):Container(),
+                      (isConnected)?btnCommand(context, "Arreter le monitoring par defaut", stopRealTime):Container(),
                       (isConnected)?btnCommand(
                           context, "Mettre à jour le nom du WIFI", updateWifiName):Container(),
                       (isConnected)?btnCommand(context, "Mettre à jour le mot de passe du WIFI",
                           updateWifiPassword):Container(),
                       (isConnected)?btnCommand(context, "Addresse IP du serveur", serverIpAddress):Container(),
                       (isConnected)?btnCommand(context, "Port du serveur", serverPort):Container(),
+                      (isConnected)?btnCommand(context, "Nom de la ceinture", deviceName):Container(),
                       (isConnected)?btnCommand(context, "Status de la ceinture", wifiStatus):Container(),
 
                     ],
@@ -245,6 +249,14 @@ class DeviceDetailPage extends StatefulWidget {
         widget.device.id.id, CeintureCommand.setTime(), isConnected);
   }
 
+  void stopRealTime() async {
+    setState(() {
+      isProgress = true;
+    });
+    await _ceintureSensorRepository.executeBleCommand(
+        widget.device.id.id, CeintureCommand.stopRealTime(), isConnected);
+  }
+
   void wifiStatus() async {
     setState(() {
       isProgress = true;
@@ -278,6 +290,16 @@ class DeviceDetailPage extends StatefulWidget {
         _buildContext,
         MaterialPageRoute(
             builder: (context) => ServerPortPage(
+                  device: widget.device,
+                  isConnected: isConnected,
+                )));
+  }
+
+  void deviceName() async {
+    await Navigator.push<void>(
+        _buildContext,
+        MaterialPageRoute(
+            builder: (context) => DeviceNamePage(
                   device: widget.device,
                   isConnected: isConnected,
                 )));

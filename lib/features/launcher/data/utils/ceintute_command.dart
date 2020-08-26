@@ -8,6 +8,7 @@ import 'package:ceinture/core/utils/function_utils.dart';
 // car 0000fff6-0000-1000-8000-00805f9b34fb
 
 class CeintureCommand {
+  static const int CMD_SET_DEVICE_NAME = 0x3D;
   static const int CMD_SET_WIFI_NAME = 0x06;
   static const int CMD_SET_WIFI_PASSWORD = 0x07;
   static const int CMD_SET_SERVER_IP_ADDRESS = 0x09;
@@ -18,6 +19,7 @@ class CeintureCommand {
   static const int CMD_SET_TIME = 0x01;
   static const int CMD_GET_CONNECTION_STATUS = 0x18;
   static const int CMD_SET_TIME_FORMAT = 0x37;
+  static const int CMD_REAL_TIME = 0x11;
 
 
   static List<int> getTime() {
@@ -147,6 +149,21 @@ class CeintureCommand {
     return command;
   }
 
+  static List<int> setDeviceName(String name) {
+    List<int> command = [];
+    command.add(CMD_SET_DEVICE_NAME);
+
+    for (int i = 0; i < name.length; i++) {
+      command.add((name.codeUnitAt(i)));
+    }
+    //
+    for (int i = 0; i < (14-name.length); i++) {
+      command.add(0);
+    }
+    command.add(FunctionUtils.getChecksum(command, 15));
+    return command;
+  }
+
 
   static List<int> setWifiNameGreatThan14s(String name) {
     List<int> command = [];
@@ -243,13 +260,36 @@ class CeintureCommand {
     command.add(port.length);
     int cpt=13;
     for (int i = 0; i < port.length; i++) {
-      command.add((port.codeUnitAt(i)));
+      command.add((int.parse(port[i])));
     }
     //
     for (int i = 0; i < (13-port.length); i++) {
       command.add(00);
     }
     command.add((0x100)-FunctionUtils.getChecksum(command, 15));
+    return command;
+  }
+
+
+  static List<int> stopRealTime() {
+    List<int> command = [
+      CMD_REAL_TIME,
+      FunctionUtils.representIntInHex(0),
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ];
+    command.add(FunctionUtils.getChecksum(command, 15));
     return command;
   }
 }

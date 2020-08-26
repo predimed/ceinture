@@ -99,7 +99,8 @@ class FindDevicesScreen extends StatelessWidget {
                 initialData: [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data.where((element) => (element.type==BluetoothDeviceType.le
-                      && element.name?.toLowerCase()?.startsWith("j")))
+                      //&& element.name?.toLowerCase()?.startsWith("j")
+                  ))
                       .map((d) =>  GestureDetector(
                     onTap: () async {
                       //widget.stopScan();
@@ -168,7 +169,8 @@ class FindDevicesScreen extends StatelessWidget {
                 initialData: [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data.where((element) => (element.device.type == BluetoothDeviceType.le
-                      && element.device.name?.toLowerCase()?.startsWith("j")))
+                      //&& element.device.name?.toLowerCase()?.startsWith("j")
+                  ))
                       .map(
                         (r) {
                           print("the data ==========###################      ${r.advertisementData.toString().toString()}");
