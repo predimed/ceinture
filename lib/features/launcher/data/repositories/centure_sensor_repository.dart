@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ceinture/core/helpers/ble/ble_device_connector.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -10,6 +12,14 @@ class CeintureSensorRepository {
   BluetoothDevice device;
   BehaviorSubject<String> _subjectCounter;
   String initialCount = "label_init";
+  static Duration interval = Duration(seconds: 3);
+  static Stream<int> stream =
+      Stream<int>.periodic(interval, transform).asBroadcastStream();
+  static StreamSubscription<int> _writeSubscription;
+
+  static int transform(int x) {
+    return (x + 1) * 2;
+  }
 
   CeintureSensorRepository(
       {this.bleDeviceConnector, this.isConnected, this.device}) {
@@ -60,51 +70,55 @@ class CeintureSensorRepository {
       {List<List<int>> commandList}) async {
     try {
       if (isConnected) {
-        print("commande lancé ==========================================");
-        Future.delayed(new Duration(milliseconds: 2000));
-        List<BluetoothService> services = await device.discoverServices();
-        try {
-          services.forEach((service) async {
-            if (service.uuid ==
-                new Guid("0000fff0-0000-1000-8000-00805f9b34fb")) {
-              print("service lancé ==========================================");
+        _writeSubscription = stream.listen((event) async {
+          print("commande lancé ==========================================");
+          Future.delayed(new Duration(milliseconds: 2000));
+          List<BluetoothService> services = await device.discoverServices();
+          try {
+            services.forEach((service) async {
+              if (service.uuid ==
+                  new Guid("0000fff0-0000-1000-8000-00805f9b34fb")) {
+                print(
+                    "service lancé ==========================================");
 
-              BluetoothCharacteristic cWrite = service.characteristics
-                  .firstWhere((element) =>
-                      element.uuid ==
-                      new Guid("0000fff6-0000-1000-8000-00805f9b34fb"));
-              print("carac lancé ==========================================");
-              try {
-                if (commandList != null && !commandList.isEmpty) {
-                  commandList.forEach((elementCommand) async {
-                    await cWrite.write(elementCommand);
-                  });
-                } else {
-                  await cWrite.write(command);
+                BluetoothCharacteristic cWrite = service.characteristics
+                    .firstWhere((element) =>
+                        element.uuid ==
+                        new Guid("0000fff6-0000-1000-8000-00805f9b34fb"));
+                print("carac lancé ==========================================");
+                try {
+                  if (commandList != null && !commandList.isEmpty) {
+                    commandList.forEach((elementCommand) async {
+                      await cWrite.write(elementCommand);
+                    });
+                  } else {
+                    await cWrite.write(command);
+                  }
+                } catch (e, s) {
+                  print(s);
+                  _subjectCounter.sink.add("message_command_fail");
                 }
-              } catch (e, s) {
-                print(s);
-                _subjectCounter.sink.add("message_command_fail");
+                //
+                BluetoothCharacteristic cNotif = service.characteristics
+                    .firstWhere((element) =>
+                        element.uuid ==
+                        new Guid("0000fff7-0000-1000-8000-00805f9b34fb"));
+                await Future.delayed(new Duration(milliseconds: 2000));
+                await cNotif.setNotifyValue(true);
+                cNotif.value.listen((value) {
+                  _writeSubscription.cancel();
+                  // do something with new value
+                  return actionTodoWithCommandReult(command, value);
+                });
+                //
+                return false;
               }
-              //
-              BluetoothCharacteristic cNotif = service.characteristics
-                  .firstWhere((element) =>
-                      element.uuid ==
-                      new Guid("0000fff7-0000-1000-8000-00805f9b34fb"));
-              await Future.delayed(new Duration(milliseconds: 2000));
-              await cNotif.setNotifyValue(true);
-              cNotif.value.listen((value) {
-                // do something with new value
-                return actionTodoWithCommandReult(command, value);
-              });
-              //
-              return false;
-            }
-          });
-        } catch (e, s) {
-          print(s);
-          //_subjectCounter.sink.add("message_command_fail");
-        }
+            });
+          } catch (e, s) {
+            print(s);
+            //_subjectCounter.sink.add("message_command_fail");
+          }
+        });
       } else {
         print(
             "connexion error ###########################========================");
@@ -125,16 +139,15 @@ class CeintureSensorRepository {
 
         case CeintureCommand.CMD_GET_CONNECTION_STATUS:
           if (data != null && !data.isEmpty) {
-            if ((data[1].toRadixString(16) == 01.toRadixString(16)) && (data[2].toRadixString(16) == 01.toRadixString(16))) {
+            if ((data[1].toRadixString(16) == 01.toRadixString(16)) &&
+                (data[2].toRadixString(16) == 01.toRadixString(16))) {
               _subjectCounter.sink.add("message_connection_success");
-            }else
-            if (data[1].toRadixString(16) == 01.toRadixString(16)) {
+            } else if (data[1].toRadixString(16) == 01.toRadixString(16)) {
               _subjectCounter.sink.add("message_connection_wifi_success");
-            }else
-            if (data[2].toRadixString(16) == 01.toRadixString(16)) {
+            } else if (data[2].toRadixString(16) == 01.toRadixString(16)) {
               _subjectCounter.sink.add("message_connection_server_success");
             }
-          }else{
+          } else {
             _subjectCounter.sink.add("message_connection_fail");
           }
           break;
