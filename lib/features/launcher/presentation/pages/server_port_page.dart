@@ -105,6 +105,7 @@ class PageState extends State<ServerPortPage> {
                     }
                     _formKey.currentState.save();
                     return null;
+
                   },
                   onSaved: (String value) {
                     serverPort = value;
