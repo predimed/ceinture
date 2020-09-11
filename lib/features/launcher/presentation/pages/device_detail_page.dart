@@ -272,11 +272,11 @@ super.initState();
     }
   }
 
-  streamMetod( VoidCallback actionStream) async {
+  void streamMetod( VoidCallback actionStream) async {
   Duration interval = Duration(seconds: 2);
   Stream<int> stream = Stream<int>.periodic(interval,(x) => x );
   await for(int i in stream) {
-    await actionStream();
+    actionStream();
   }
   }
   void getDate() async {
