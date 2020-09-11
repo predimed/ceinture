@@ -290,8 +290,6 @@ class _MysettingPageState  extends State<SettingPage> {
     }
   }
 
-
-
   showWifiNameForm() {
     showModalBottomSheet(
       context: _buildContext,

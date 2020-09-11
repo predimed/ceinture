@@ -1,5 +1,7 @@
 import 'package:ceinture/core/helpers/ble/ble_device_connector.dart';
+import 'package:ceinture/core/utils/centure_constants.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
+
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:rxdart/rxdart.dart';
@@ -81,6 +83,7 @@ class CeintureSensorRepository {
                   });
                 } else {
                   await cWrite.write(command);
+
                 }
               } catch (e, s) {
                 print(s);
@@ -138,9 +141,23 @@ class CeintureSensorRepository {
             _subjectCounter.sink.add("message_connection_fail");
           }
           break;
+        case CeintureCommand.CMD_GET_SERVER_IP_ADDRESS:
+          _subjectCounter.sink.add("message_get_server_ip_success");
+          Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS=data;
+
+          return true;
+          break;
+
 
         case CeintureCommand.CMD_SET_TIME:
           _subjectCounter.sink.add("message_time_update_success");
+          return true;
+          break;
+
+        case CeintureCommand.CMD_GET_TIME:
+          var res;
+          _subjectCounter.sink.add("message_get_time_success");
+          Ceintureconstante.CEINTURE_TIME_LIST= data;
           return true;
           break;
 
@@ -221,22 +238,25 @@ class CeintureSensorRepository {
     return false;
   }
 
-  Future<List<int>> getTime(String deviceId) async {
+  Future<String> getTime(String deviceId ) async {
     var x = await executeCommand(deviceId, CeintureCommand.getTime());
     //await Future.delayed(new Duration(milliseconds: 8000));
     final characteristicNoti = QualifiedCharacteristic(
         serviceId: Uuid.parse("0000fff0-0000-1000-8000-00805f9b34fb"),
         characteristicId: Uuid.parse("0000fff7-0000-1000-8000-00805f9b34fb"),
         deviceId: deviceId);
-
+    List<String> res = [];
     await bleDeviceConnector.ble
         .subscribeToCharacteristic(characteristicNoti)
         .listen((data) {
       data.forEach((element) {
+        res.add('${element.toRadixString(16)}');
         print(
             "voici les changement  en hexa  que je veux  :   ${element.toRadixString(16)}");
+
       });
-    }, onError: (dynamic error) {
+      return res.join(', ');
+      }, onError: (dynamic error) {
       print("Error chanfgement from a device: $error");
     });
   }
@@ -280,4 +300,5 @@ class CeintureSensorRepository {
       print("Error chanfgement from a device: $error");
     });
   }
+
 }

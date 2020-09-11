@@ -8,7 +8,9 @@ import 'package:ceinture/core/utils/function_utils.dart';
 // car 0000fff6-0000-1000-8000-00805f9b34fb
 
 class CeintureCommand {
-  static const int CMD_SET_DEVICE_NAME = 0x3D;
+  static const int CMD_GET_SERVER_IP_ADDRESS=0x10;
+  static const int CMD_SET_DEVICE_NAME =0x3D;
+  static const int CMD_GET_DEVICE_NAME =0x3E ;
   static const int CMD_SET_WIFI_NAME = 0x06;
   static const int CMD_SET_WIFI_PASSWORD = 0x07;
   static const int CMD_SET_SERVER_IP_ADDRESS = 0x09;
@@ -40,9 +42,12 @@ class CeintureCommand {
       0,
       0
     ];
+    print('la conversion de char======================== ========= ${command}');
+
     command.add(FunctionUtils.getChecksum(command, 15));
     return command;
   }
+
 
   static List<int> getConnectionStatus() {
     List<int> command = [
@@ -270,7 +275,27 @@ class CeintureCommand {
     return command;
   }
 
-
+  static List<int> getServerIpAddress() {
+    List<int> command = [
+      CMD_GET_SERVER_IP_ADDRESS,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ];
+    command.add(FunctionUtils.getChecksum(command, 15));
+    return command;
+  }
   static List<int> stopRealTime() {
     List<int> command = [
       CMD_REAL_TIME,

@@ -39,7 +39,7 @@ class FunctionUtils {
 
   static int representStringInHex(String number) {
     //print('valeur avant convertion ${number}');
-    //print('valeur apres convertion 0X${number}');
+   // print('valeur apres convertion 0X${number}');
     return int.parse('0X${number}');
   }
 

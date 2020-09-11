@@ -144,7 +144,7 @@ class FindDevicesScreen extends StatelessWidget {
                                   flex: 2,
                                   child: Container(
                                     padding: EdgeInsets.all(5),
-                                    child: Text('${d.id}'),
+                                    child: Text('${d.id}}'),
                                   ),
                                 ),
                                 Expanded(
