@@ -1,4 +1,5 @@
 import 'package:ceinture/core/helpers/ble/ble_device_connector.dart';
+import 'package:ceinture/core/utils/centure_constants.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -161,7 +162,21 @@ class CeintureSensorRepository {
             return true;
           }
           break;
+        case CeintureCommand.CMD_GET_TIME:
 
+          _subjectCounter.sink.add("message_get_server_ip_success");
+          Ceintureconstante.CEINTURE_TIME_LIST=data;
+          return true;
+
+          break;
+        case CeintureCommand.CMD_GET_SERVER_IP_ADDRESS:
+
+            _subjectCounter.sink.add("message_get_server_ip_success");
+            Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS=data;
+
+            return true;
+
+          break;
         case CeintureCommand.CMD_SET_WIFI_PASSWORD:
           if (data != null &&
               !data.isEmpty &&
