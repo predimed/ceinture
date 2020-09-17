@@ -63,8 +63,13 @@ class CeintureSensorRepository {
       if (isConnected) {
         print("commande lancé ==========================================");
         Future.delayed(new Duration(milliseconds: 2000));
-        List<BluetoothService> services = await device.discoverServices();
+        List<BluetoothService> services;
         try {
+          try {
+            services = await device.discoverServices();
+          } catch (ex) {
+            print(ex);
+          }
           services.forEach((service) async {
             if (service.uuid ==
                 new Guid("0000fff0-0000-1000-8000-00805f9b34fb")) {
@@ -126,16 +131,15 @@ class CeintureSensorRepository {
 
         case CeintureCommand.CMD_GET_CONNECTION_STATUS:
           if (data != null && !data.isEmpty) {
-            if ((data[1].toRadixString(16) == 01.toRadixString(16)) && (data[2].toRadixString(16) == 01.toRadixString(16))) {
+            if ((data[1].toRadixString(16) == 01.toRadixString(16)) &&
+                (data[2].toRadixString(16) == 01.toRadixString(16))) {
               _subjectCounter.sink.add("message_connection_success");
-            }else
-            if (data[1].toRadixString(16) == 01.toRadixString(16)) {
+            } else if (data[1].toRadixString(16) == 01.toRadixString(16)) {
               _subjectCounter.sink.add("message_connection_wifi_success");
-            }else
-            if (data[2].toRadixString(16) == 01.toRadixString(16)) {
+            } else if (data[2].toRadixString(16) == 01.toRadixString(16)) {
               _subjectCounter.sink.add("message_connection_server_success");
             }
-          }else{
+          } else {
             _subjectCounter.sink.add("message_connection_fail");
           }
           break;
@@ -163,19 +167,52 @@ class CeintureSensorRepository {
           }
           break;
         case CeintureCommand.CMD_GET_TIME:
-
           _subjectCounter.sink.add("message_get_server_ip_success");
-          Ceintureconstante.CEINTURE_TIME_LIST=data;
+          Ceintureconstante.CEINTURE_TIME_LIST = data;
           return true;
 
           break;
         case CeintureCommand.CMD_GET_SERVER_IP_ADDRESS:
+          if (data != null && !data.isEmpty) {
+            if ((data[1].toRadixString(16) == 01.toRadixString(16)) &&
+                (data[2].toRadixString(16) == 01.toRadixString(16))) {
+              _subjectCounter.sink.add("message_get_server_ip_success");
+              Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS1 = data;
+              return true;
+            }
+            else if (data[1].toRadixString(16) == 02.toRadixString(16))
+                {
+              _subjectCounter.sink.add("message_get_server_ip_success");
+              if(data[2].toRadixString(16) == 01.toRadixString(16)){
+                Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS1 = data;
+              }
+              if(data[2].toRadixString(16) == 02.toRadixString(16)) {
+                Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS2 = data;
+              }
+            }
+            else if (data[1].toRadixString(16) == 03.toRadixString(16)){
+              _subjectCounter.sink.add("message_get_server_ip_success");
+              if(data[2].toRadixString(16) == 01.toRadixString(16)){
+                Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS1 = data;
+              }
+              if(data[2].toRadixString(16) == 02.toRadixString(16)) {
+                Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS2 = data;
+              }
+              if(data[2].toRadixString(16) == 02.toRadixString(16)) {
+                Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS3 = data;
+              }
+            }
+          }
 
-            _subjectCounter.sink.add("message_get_server_ip_success");
-            Ceintureconstante.CEINTURE_SERVER_IP_ADDRESS=data;
+          break;
+        case CeintureCommand.CMD_GET_WIFI_NAME:
+          _subjectCounter.sink.add("message_get_wifi_name_success");
+          Ceintureconstante.CEINTURE_WIFI_NAME = data;
+          print('185');
+          print(data);
+          print(Ceintureconstante.CEINTURE_WIFI_NAME);
 
-            return true;
-
+          return true;
           break;
         case CeintureCommand.CMD_SET_WIFI_PASSWORD:
           if (data != null &&

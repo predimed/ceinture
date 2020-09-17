@@ -12,6 +12,8 @@ class CeintureCommand {
   static const int CMD_SET_DEVICE_NAME =0x3D;
   static const int CMD_GET_DEVICE_NAME =0x3E ;
   static const int CMD_SET_WIFI_NAME = 0x06;
+  static const int CMD_GET_WIFI_NAME = 0x18;
+
   static const int CMD_SET_WIFI_PASSWORD = 0x07;
   static const int CMD_SET_SERVER_IP_ADDRESS = 0x09;
   static const int CMD_SET_SERVER_PORT = 0x0a;
@@ -47,7 +49,27 @@ class CeintureCommand {
     command.add(FunctionUtils.getChecksum(command, 15));
     return command;
   }
-
+  static List<int> getWifiName() {
+    List<int> command = [
+      CMD_GET_WIFI_NAME,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ];
+    command.add(FunctionUtils.getChecksum(command, 15));
+    return command;
+  }
 
   static List<int> getConnectionStatus() {
     List<int> command = [

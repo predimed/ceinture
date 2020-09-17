@@ -102,7 +102,7 @@ class PageState extends State<DeviceNamePage> {
                 ),
                 MyTextFormField(
                   hintText: 'Nom de la ceinture',
-                  initialValue: '',
+                  initialValue: widget.device.name,
                   validator: (String value) {
                     if (value.length < 1) {
                       return "Veuillez renseigner votre ce champs";

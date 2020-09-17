@@ -7,6 +7,7 @@ class AppSharedPreferences {
   final String userId = "userID";
   final String userEmail = "userEmail";
   final String userLanguage = "userLanguage";
+  final String wifiName = "wifiName";
 
 
   Future<bool> getAllowsNotifications() async {
@@ -67,6 +68,14 @@ class AppSharedPreferences {
 
     return prefs.getString(userLanguage) ?? "";
   }
+  Future<bool> setWifiName(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await translationsUtils.setNewLanguage(value);
+    return prefs.setString(wifiName, value);
+  }
+  Future<String> getWifiName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-
+    return prefs.getString(wifiName) ?? "";
+  }
 }

@@ -28,7 +28,7 @@ packages:
       name: card_settings
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.12.1"
+    version: "1.12.2"
   characters:
     dependency: transitive
     description:
@@ -180,7 +180,12 @@ packages:
       name: flutter_html
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.2"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_masked_text:
     dependency: transitive
     description:
@@ -194,7 +199,7 @@ packages:
       name: flutter_material_pickers
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.3"
+    version: "1.7.4"
   flutter_multi_formatter:
     dependency: transitive
     description:
@@ -208,7 +213,7 @@ packages:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.8"
+    version: "1.0.9"
   flutter_reactive_ble:
     dependency: "direct main"
     description:
@@ -222,7 +227,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.17.4"
+    version: "0.18.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -365,7 +370,7 @@ packages:
       name: petitparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.0"
+    version: "3.0.4"
   plain_optional:
     dependency: transitive
     description:
@@ -407,7 +412,7 @@ packages:
       name: provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.3.2+1"
+    version: "4.3.2+2"
   rxdart:
     dependency: "direct main"
     description:
@@ -601,7 +606,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.6.1"
+    version: "4.2.0"
 sdks:
   dart: ">=2.9.0-14.0.dev <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.18.0-6.0.pre <2.0.0"
