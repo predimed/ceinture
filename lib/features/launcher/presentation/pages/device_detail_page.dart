@@ -350,7 +350,7 @@ super.initState();
 
           Text(title,
           textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.bodyText2.apply(color: Colors.black,fontStyle: FontStyle.italic)),
+              style: TextStyle(color: Colors.black,fontStyle: FontStyle.italic)),
           SizedBox(
             width: 12.0,
           ),
