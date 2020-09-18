@@ -63,9 +63,7 @@ class PageState extends State<WifiNamePage> {
     });
     if (defaultName != _wifiName) {
       _appSharedPreferences.setWifiName(_wifiName);
-      print("68");
-      print(defaultName);
-      print(_wifiName);
+
     }
     //String name = "didierccccccccccccccc";
     if (_wifiName.length <= 14) {

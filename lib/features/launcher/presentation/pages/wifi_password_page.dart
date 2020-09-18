@@ -1,5 +1,4 @@
-
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:ceinture/core/utils/preference.dart';
 import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
@@ -22,10 +21,15 @@ class WifiPasswordPage extends StatefulWidget {
 class PageState extends State<WifiPasswordPage> {
   List<bool> selectionList = List.generate(2, (_) => false);
   final _formKey = GlobalKey<FormState>();
-  String _wifiName;
+  String _wifiPsw;
   BuildContext _buildContext;
   BuildContext _dialogContext;
   bool isProgress = false;
+  AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
+  String defaultwifiPsw='';
+
+  var textController = new TextEditingController();
+
 
   CeintureSensorRepository _ceintureSensorRepository;
 
@@ -54,8 +58,12 @@ class PageState extends State<WifiPasswordPage> {
     setState(() {
       isProgress = true;
     });
+    if (defaultwifiPsw != _wifiPsw) {
+      _appSharedPreferences.setWifiPsw(_wifiPsw);
+
+    }
     await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
-        CeintureCommand.setWifiPassword(_wifiName), widget.isConnected);
+        CeintureCommand.setWifiPassword(_wifiPsw), widget.isConnected);
   }
 
   @override
@@ -91,20 +99,46 @@ class PageState extends State<WifiPasswordPage> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                MyTextFormField(
-                  hintText: 'Mot de passe du wifi',
-                  initialValue: '',
-                  validator: (String value) {
-                    if (value.length < 1) {
-                      return "Veuillez renseigner votre ce champs";
+                FutureBuilder(
+                  future:  _appSharedPreferences.getWifiPsw(),
+                  builder: (context,  AsyncSnapshot<String> snapshot) {
+                    if(snapshot.hasData && snapshot.connectionState== ConnectionState.done){
+                      defaultwifiPsw = snapshot?.data;
+                      textController.text=defaultwifiPsw;
+                      return MyTextFormField(
+                        hintText: 'Mot de passe du wifi',
+                        controller: textController,
+                        validator: (String value) {
+                          if (value.length < 1) {
+                            return "Veuillez renseigner votre ce champs";
+                          }
+                          _formKey.currentState.save();
+                          return null;
+                        },
+                        onSaved: (String value) {
+                          _wifiPsw = value;
+                        },
+                      );
+                    }else{
+                      return MyTextFormField(
+                        hintText: 'Mot de passe du wifi',
+                        controller: textController,
+                        validator: (String value) {
+                          if (value.length < 1) {
+                            return "Veuillez renseigner votre ce champs";
+                          }
+                          _formKey.currentState.save();
+                          return null;
+                        },
+                        onSaved: (String value) {
+                          _wifiPsw = value;
+                        },
+                      );
                     }
-                    _formKey.currentState.save();
-                    return null;
-                  },
-                  onSaved: (String value) {
-                    _wifiName = value;
+
                   },
                 ),
+
                 SizedBox(
                   height: 20,
                 ),
@@ -202,11 +236,14 @@ class MyTextFormField extends StatelessWidget {
   final bool isPassword;
   final bool isEmail;
   final bool isNumber;
+  TextEditingController controller;
+
 
   MyTextFormField({
     this.hintText,
     this.initialValue,
     this.validator,
+    this.controller,
     this.onSaved,
     this.isPassword = false,
     this.isEmail = false,
@@ -225,6 +262,7 @@ class MyTextFormField extends StatelessWidget {
           filled: true,
           fillColor: Colors.grey[200],
         ),
+        controller: controller,
         obscureText: isPassword ? true : false,
         validator: validator,
         onSaved: onSaved,

@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:toast/toast.dart';
+import 'package:ceinture/core/utils/preference.dart';
 
 class ServerPortPage extends StatefulWidget {
 
@@ -26,8 +27,10 @@ class PageState extends State<ServerPortPage> {
   BuildContext _buildContext;
   BuildContext _dialogContext;
   bool isProgress = false;
-
+  AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
+  String defaultServerPort='';
   CeintureSensorRepository _ceintureSensorRepository;
+  var textController = new TextEditingController();
 
   @override
   void initState() {
@@ -56,6 +59,10 @@ class PageState extends State<ServerPortPage> {
     setState(() {
       isProgress = true;
     });
+    if (defaultServerPort != serverPort) {
+      _appSharedPreferences.setServerPort(serverPort);
+
+    }
     if (serverPort.length <= 14) {
       await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
           CeintureCommand.setServerPort(serverPort), widget.isConnected);
@@ -95,22 +102,47 @@ class PageState extends State<ServerPortPage> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                MyTextFormField(
-                  hintText: 'Port du serveur',
-                  initialValue: '9876',
-                  isNumber: true,
-                  validator: (String value) {
-                    if (value.length < 1) {
-                      return "Veuillez renseigner votre ce champs";
+
+                FutureBuilder(
+                  future:  _appSharedPreferences.getServerPort(),
+                  builder: (context,  AsyncSnapshot<String> snapshot) {
+                    if(snapshot.hasData && snapshot.connectionState== ConnectionState.done){
+                      defaultServerPort = snapshot?.data;
+                      textController.text=defaultServerPort;
+                      return MyTextFormField(
+                        hintText: 'Port du serveur',
+                        controller: textController ,
+                        validator: (String value) {
+                          if (value.length < 1) {
+                            return "Veuillez renseigner votre ce champs";
+                          }
+                          _formKey.currentState.save();
+                          return null;
+                        },
+                        onSaved: (String value) {
+                          serverPort = value;
+                        },
+                      );
+                    }else{
+                      return MyTextFormField(
+                        hintText: 'Nom du wifi',
+                        controller: textController,
+                        validator: (String value) {
+                          if (value.length < 1) {
+                            return "Veuillez renseigner votre ce champs";
+                          }
+                          _formKey.currentState.save();
+                          return null;
+                        },
+                        onSaved: (String value) {
+                          serverPort = value;
+                        },
+                      );
                     }
-                    _formKey.currentState.save();
-                    return null;
 
                   },
-                  onSaved: (String value) {
-                    serverPort = value;
-                  },
                 ),
+
                 SizedBox(
                   height: 20,
                 ),
@@ -180,8 +212,10 @@ class MyTextFormField extends StatelessWidget {
   final bool isPassword;
   final bool isEmail;
   final bool isNumber;
+  final TextEditingController controller;
 
-  MyTextFormField({
+    MyTextFormField({
+    this.controller,
     this.hintText,
     this.initialValue,
     this.validator,
@@ -203,6 +237,7 @@ class MyTextFormField extends StatelessWidget {
           filled: true,
           fillColor: Colors.grey[200],
         ),
+        controller: controller,
         obscureText: isPassword ? true : false,
         validator: validator,
         onSaved: onSaved,

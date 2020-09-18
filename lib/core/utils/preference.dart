@@ -8,6 +8,8 @@ class AppSharedPreferences {
   final String userEmail = "userEmail";
   final String userLanguage = "userLanguage";
   final String wifiName = "wifiName";
+  final String wifiPsw = "wifipsw";
+  final String serverPort = "serverPort";
 
 
   Future<bool> getAllowsNotifications() async {
@@ -77,5 +79,25 @@ class AppSharedPreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     return prefs.getString(wifiName) ?? "";
+  }
+  Future<bool> setWifiPsw(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await translationsUtils.setNewLanguage(value);
+    return prefs.setString(wifiPsw, value);
+  }
+  Future<String> getWifiPsw() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString(wifiPsw) ?? "";
+  }
+  Future<bool> setServerPort(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await translationsUtils.setNewLanguage(value);
+    return prefs.setString(serverPort, value);
+  }
+  Future<String> getServerPort() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString(serverPort) ?? "";
   }
 }
