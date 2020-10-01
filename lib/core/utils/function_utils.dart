@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -35,6 +37,37 @@ class FunctionUtils {
     print('mesure $x1  et $x2');
     int x3 = int.parse('${x1}${x2}');
     return x3;
+  }
+  static Stream<int> timedCounter(Duration interval, [int maxCount]) {
+    var controller = StreamController<int>();
+    int counter = 0;
+    void tick(Timer timer) {
+      counter++;
+      controller.add(counter); // Ask stream to send counter values as event.
+      if (maxCount != null && counter >= maxCount) {
+        timer.cancel();
+        controller.close(); // Ask stream to shut down and tell listeners.
+      }
+    }
+
+  Timer.periodic(interval, tick); // BAD: Starts before it has subscribers.
+  return controller.stream;
+}
+
+  static Stream<int> timeDateCounter(Duration interval, [int maxCount]) {
+    var controller = StreamController<int>();
+    int counter = 0;
+    void tick(Timer timer) {
+      counter++;
+      controller.add(counter); // Ask stream to send counter values as event.
+      if (maxCount != null && counter >= maxCount) {
+        timer.cancel();
+        controller.close(); // Ask stream to shut down and tell listeners.
+      }
+    }
+
+    Timer.periodic(interval, tick); // BAD: Starts before it has subscribers.
+    return controller.stream;
   }
 
   static int representStringInHex(String number) {

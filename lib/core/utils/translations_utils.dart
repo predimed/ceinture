@@ -68,22 +68,14 @@ class TranslationsUtils {
   Future<Null> setNewLanguage([String newLanguage, bool saveInPrefs = false]) async {
     String language = newLanguage;
     if (language == null){
-      language = await  appSharedPreferences.getLanguage();
+      language = await  appSharedPreferences.getLanguage();;
     }
     print('ma langue $newLanguage');
 
     // Set the locale
-    if (language == "" ){
-      try{
-
-        String _deviceLocale = WidgetsBinding.instance.window.locale.languageCode;
-        language = _deviceLocale;
-      }catch(e){
-        language = "en";
-      }
+    if (language == ""){
+      language = "en";
     }
-    //a enlever apres
-    language = "fr";
     _locale = Locale(language, "");
 
     // Load the language strings

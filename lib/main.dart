@@ -9,6 +9,7 @@ import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/presentation/pages/launch_page.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,6 +75,13 @@ class _MyAppState extends State<MyApp> {
 
 
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
+
+      // Tells the system which are the supported languages
+      supportedLocales: translationsUtils.supportedLocales(),
       title: 'Ceinture App',
       initialRoute: '/',
       routes: {

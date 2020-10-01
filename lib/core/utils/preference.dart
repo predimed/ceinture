@@ -50,7 +50,7 @@ class AppSharedPreferences {
   Future<String> getUserEmail() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return prefs.getString(userEmail) ?? "";
+    return prefs.getString(userEmail) ?? translationsUtils.text("not_configured");
   }
 
   Future<bool> setUserEmail(String value) async {
@@ -72,32 +72,28 @@ class AppSharedPreferences {
   }
   Future<bool> setWifiName(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await translationsUtils.setNewLanguage(value);
     return prefs.setString(wifiName, value);
   }
   Future<String> getWifiName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    return prefs.getString(wifiName) ?? "";
+    return prefs.getString(wifiName) ??  translationsUtils.text("not_configured");
   }
   Future<bool> setWifiPsw(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await translationsUtils.setNewLanguage(value);
     return prefs.setString(wifiPsw, value);
   }
   Future<String> getWifiPsw() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return prefs.getString(wifiPsw) ?? "";
+    return prefs.getString(wifiPsw) ?? translationsUtils.text("not_configured");;
   }
   Future<bool> setServerPort(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await translationsUtils.setNewLanguage(value);
     return prefs.setString(serverPort, value);
   }
   Future<String> getServerPort() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return prefs.getString(serverPort) ?? "";
+    return prefs.getString(serverPort) ?? translationsUtils.text("not_configured");;
   }
 }

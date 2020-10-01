@@ -1,6 +1,10 @@
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ceinture/core/utils/colors.dart';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
@@ -26,13 +30,16 @@ class PageState extends State<DeviceNamePage> {
   BuildContext _buildContext;
   BuildContext _dialogContext;
   bool isProgress = false;
-
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   CeintureSensorRepository _ceintureSensorRepository;
 
   @override
   void initState() {
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
+
       switch (event) {
         case 'message_command_fail':
         case 'message_ceintur_update_success':
@@ -51,8 +58,27 @@ class PageState extends State<DeviceNamePage> {
   }
 
 
+  updateCeintureNameValidate(){
+    print("63event");
+    print(eventCeinture);
+    if(eventCeinture!='message_ceintur_update_success') {
+      //Future.delayed(Duration(seconds: 1));
+      var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 5);
+      subscription = counterStream.listen((int counter) {
+        updateCeintureName();
+        print("eventC");
+        print(eventCeinture);
+        if (eventCeinture=='message_ceintur_update_success') {
+          print("eventCancel");
+          subscription.cancel();
+          //sleep(Duration(hours: 2));
+        }
+      });
 
-  void updateCeintureNameValidate() async {
+    }
+
+  }
+  void updateCeintureName() async {
     print("mon dialog, tu as quoi==================");
     setState(() {
       isProgress = true;
@@ -174,6 +200,7 @@ class PageState extends State<DeviceNamePage> {
   }
 
 }
+
 
 class MyTextFormField extends StatelessWidget {
   final String hintText;

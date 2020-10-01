@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/presentation/pages/device_detail_page.dart';
@@ -24,6 +23,8 @@ class HomePage extends StatelessWidget {
           }),
     );
   }
+
+
 }
 
 class BluetoothOffScreen extends StatelessWidget {
@@ -33,8 +34,11 @@ class BluetoothOffScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: primaryColor,
+
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -61,6 +65,8 @@ class BluetoothOffScreen extends StatelessWidget {
 class FindDevicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final String language = translationsUtils.currentLanguage;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -69,17 +75,18 @@ class FindDevicesScreen extends StatelessWidget {
             Expanded(
               flex: 1,
               child: GestureDetector(
-                child: Container()
+                  child: Container()
 
               ),
             ),
             Expanded(
-                flex: 10,
+                flex: 8,
                 child: Text(
                   translationsUtils.text("app_name"),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 22),
                 )),
+
           ],
         ),
         backgroundColor: primaryColor,
@@ -87,93 +94,117 @@ class FindDevicesScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            //FlutterBlue.instance.startScan(withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
-            FlutterBlue.instance.startScan(
-                timeout: Duration(seconds: 4)),
+        //FlutterBlue.instance.startScan(withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
+        FlutterBlue.instance.startScan(
+            timeout: Duration(seconds: 4)),
         child: SingleChildScrollView(
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          color: primaryColor,
+          elevation: 10,
           child: Column(
             children: <Widget>[
               StreamBuilder<List<BluetoothDevice>>(
                 stream: Stream.periodic(Duration(seconds: 2))
-                    .asyncMap((_) => FlutterBlue.instance.connectedDevices),
+                    .asyncMap((_) => FlutterBlue.instance.connectedDevices) ,
                 initialData: [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data.where((element) => (element.type==BluetoothDeviceType.le
-                      //&& element.name?.toLowerCase()?.startsWith("j")
-                  ))
-                      .map((d) =>  GestureDetector(
-                    onTap: () async {
-                      //widget.stopScan();
-                      await Navigator.push<void>(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) =>
-                                  DeviceDetailPage(device: d)));
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(5),
-                      color: Colors.grey[200],
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Container(
-                            color: selectMenuColor,
-                            padding: EdgeInsets.all(5),
-                            height: 40,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                d.name,style: TextStyle(color: Colors.white),
-                                textAlign: TextAlign.left,
+                builder: (c, snapshot) =>
+                    Column(
+                      children: snapshot.data.where((element) =>
+                      (element.type == BluetoothDeviceType.le
+                          //&& element.name?.toLowerCase()?.startsWith("j")
+                      ))
+                          .map((d) =>
+                          GestureDetector(
+                            onTap: () async {
+                              //widget.stopScan();
+                              await Navigator.push<void>(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          DeviceDetailPage(device: d)));
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: selectMenuColor,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))
+                              ),
+                              child: Column(
+
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Container(
+                                    color: primaryColor,
+                                    padding: EdgeInsets.all(5),
+                                    height: 40,
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        d.name,
+                                        style: TextStyle(color: Colors.white),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Row(
+                                      children: <Widget>[
+
+                                        Expanded(
+                                          flex: 1,
+                                          child: Container(
+                                              padding: EdgeInsets.all(5),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Icon(Icons.bluetooth_connected,
+                                                  color: primaryColor,),
+
+                                              )),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            child: Text('${d.id}}',
+                                              textAlign: TextAlign.center,),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            child: Icon(Icons.cloud_done,
+                                              color: primaryColor,),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                          Container(
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                      padding: EdgeInsets.all(5),
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Icon(Icons.bluetooth, color: selectMenuColor,),
-                                      )),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text('${d.id}}'),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Icon(Icons.cloud_done, color: selectMenuColor,),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                          ))
+                          .toList(),
                     ),
-                  ))
-                      .toList(),
-                ),
               ),
               StreamBuilder<List<ScanResult>>(
                 stream: FlutterBlue.instance.scanResults,
                 initialData: [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data.where((element) => (element.device.type == BluetoothDeviceType.le
-                      //&& element.device.name?.toLowerCase()?.startsWith("j")
-                  ))
-                      .map(
-                        (r) {
-                          print("the data ==========###################      ${r.advertisementData.toString().toString()}");
+                builder: (c, snapshot) =>
+                    Column(
+                      children: snapshot.data.where((element) =>
+                      (element.device.type == BluetoothDeviceType.le
+                          //&& element.device.name?.toLowerCase()?.startsWith("j")
+                      ))
+                          .map(
+                            (r) {
+                          print("the data ==========###################      ${r
+                              .advertisementData.toString()
+                              .toString()}");
                           return GestureDetector(
                             onTap: () async {
                               //widget.stopScan();
@@ -183,65 +214,54 @@ class FindDevicesScreen extends StatelessWidget {
                                       builder: (_) =>
                                           DeviceDetailPage(device: r.device)));
                             },
-                            child: Container(
-                              margin: EdgeInsets.all(5),
-                              color: Colors.grey[200],
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: <Widget>[
-                                  Container(
-                                    color: Colors.grey[400],
-                                    padding: EdgeInsets.all(5),
-                                    height: 40,
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        r.device.name,
-                                        textAlign: TextAlign.left,
-                                      ),
+                            child: Card(
+                            elevation: 8.0,
+                            margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                              child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: <Color>[
+                                  primaryColor,
+                                  selectMenuColor
+                                ]),
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))
+                              ),
+                               child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                                    leading: Container(
+                                      padding: EdgeInsets.only(right: 12.0),
+                                      decoration: new BoxDecoration(
+                                          border: new Border(
+                                              right: new BorderSide(width: 1.0, color: Colors.white24))),
+                                      child: Icon(Icons.dock, color: Colors.white),
                                     ),
-                                  ),
-                                  Container(
-                                    child: Row(
+                                    title: Text(
+                                      r.device.name,
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
+
+                                    subtitle: Row(
                                       children: <Widget>[
-                                        Expanded(
-                                          flex: 1,
-                                          child: Container(
-                                              padding: EdgeInsets.all(5),
-                                              child: Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Icon(Icons.bluetooth),
-                                              )),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Container(
-                                            padding: EdgeInsets.all(5),
-                                            child: Text('${r.device.id}'),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Container(
-                                            padding: EdgeInsets.all(5),
-                                            child: Icon(Icons.cloud_off),
-                                          ),
-                                        )
+                                        Icon(Icons.perm_device_information, color: Colors.yellowAccent),
+                                        Text('${r.device.id}', style: TextStyle(color: Colors.white))
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
+                                    trailing:
+                                    Icon(Icons.bluetooth, color: Colors.white, size: 30.0)
+                                ),
+                            ),
                             ),
                           );
-
                         },
                       )
-                      .toList(),
-                ),
+                          .toList(),
+                    ),
               ),
             ],
           ),
+        ),
         ),
       ),
       floatingActionButton: StreamBuilder<bool>(
@@ -256,17 +276,26 @@ class FindDevicesScreen extends StatelessWidget {
             );
           } else {
             return FloatingActionButton(
+                backgroundColor: Colors.green,
+
                 child: Icon(
                   Icons.search,
-                  color: primaryColor,
+                  color: Colors.white
                 ),
-                onPressed: () => FlutterBlue.instance
+                onPressed: () =>
+                    FlutterBlue.instance
                     //.startScan( withDevices:[new Guid("0000fff0-0000-1000-8000-00805f9b34fb")],
-                    .startScan(
-                    timeout: Duration(seconds: 4)));
+                        .startScan(
+                        timeout: Duration(seconds: 4)));
           }
         },
       ),
     );
   }
+
+
+
+
+
 }
+

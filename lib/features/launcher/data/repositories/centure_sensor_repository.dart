@@ -167,9 +167,10 @@ class CeintureSensorRepository {
           }
           break;
         case CeintureCommand.CMD_GET_TIME:
-          _subjectCounter.sink.add("message_get_server_ip_success");
+          _subjectCounter.sink.add("message_get_time_success");
           Ceintureconstante.CEINTURE_TIME_LIST = data;
           return true;
+
 
           break;
         case CeintureCommand.CMD_GET_SERVER_IP_ADDRESS:

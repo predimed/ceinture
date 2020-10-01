@@ -1,6 +1,9 @@
 
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ceinture/core/utils/colors.dart';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
@@ -26,13 +29,15 @@ class PageState extends State<ServerIpAdressPage> {
   BuildContext _buildContext;
   BuildContext _dialogContext;
   bool isProgress = false;
-
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   CeintureSensorRepository _ceintureSensorRepository;
 
   @override
   void initState() {
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
       switch (event) {
         case 'message_command_fail':
         case 'message_server_ip_adress_update_success':
@@ -50,13 +55,34 @@ class PageState extends State<ServerIpAdressPage> {
     super.initState();
   }
 
+  updateServerIpAddressValidate(){
+    print("59event");
+    print(eventCeinture);
+    if(eventCeinture!='message_server_ip_adress_update_success') {
+      //Future.delayed(Duration(seconds: 1));
+      var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 10);
+      subscription = counterStream.listen((int counter) {
+        updateServerIpAddress();
 
+        print("eventC");
+        print(eventCeinture);
+        if (eventCeinture=='message_server_ip_adress_update_success') {
+          // After 5 ticks, pause for five seconds, then resume.
+          subscription.cancel();
+          print("eventCancel");
+        }
+      });
 
-  void updateServerIpAddressValidate() async {
+    }
+
+  }
+
+  void updateServerIpAddress() async {
     setState(() {
       isProgress = true;
     });
     if (serverIpAddress.length <= 14) {
+      print("setServerIpAdress");
       await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
           CeintureCommand.setServerIpAdress(serverIpAddress), widget.isConnected);
     }

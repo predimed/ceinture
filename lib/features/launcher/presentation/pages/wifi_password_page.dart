@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/preference.dart';
 import 'package:ceinture/core/utils/colors.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
@@ -27,7 +29,8 @@ class PageState extends State<WifiPasswordPage> {
   bool isProgress = false;
   AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
   String defaultwifiPsw='';
-
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   var textController = new TextEditingController();
 
 
@@ -37,6 +40,8 @@ class PageState extends State<WifiPasswordPage> {
   void initState() {
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
+
       switch (event) {
         case 'message_command_fail':
         case 'message_wifi_password_update_success':
@@ -53,7 +58,27 @@ class PageState extends State<WifiPasswordPage> {
     super.initState();
   }
 
+  updateWifiPasswordValidate(){
+    print("63event");
+    print(eventCeinture);
+    if(eventCeinture!='message_wifi_password_update_success') {
+      //Future.delayed(Duration(seconds: 1));
+      var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 10);
+      subscription = counterStream.listen((int counter) {
+        updateWifiPassword();
 
+        print("eventC");
+        print(eventCeinture);
+        if (eventCeinture=='message_wifi_password_update_success') {
+          print("eventCancel");
+          subscription.cancel();
+
+        }
+      });
+
+    }
+
+  }
   void updateWifiPassword() async {
     setState(() {
       isProgress = true;
@@ -147,7 +172,7 @@ class PageState extends State<WifiPasswordPage> {
                     //setState(() {
                     if (_formKey.currentState.validate()) {
                       //showLoaderDialog();
-                      updateWifiPassword();
+                      updateWifiPasswordValidate();
                     }
                     //});
                   },

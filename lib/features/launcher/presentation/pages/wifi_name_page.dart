@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ceinture/core/utils/colors.dart';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/preference.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
@@ -29,7 +32,8 @@ class PageState extends State<WifiNamePage> {
   bool isProgress = false;
   AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
   String defaultName='';
-
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   var textController = new TextEditingController();
 
   CeintureSensorRepository _ceintureSensorRepository;
@@ -38,6 +42,8 @@ class PageState extends State<WifiNamePage> {
   void initState() {
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
+
       switch (event) {
         case 'message_command_fail':
         case 'message_wifi_update_success':
@@ -55,7 +61,29 @@ class PageState extends State<WifiNamePage> {
     super.initState();
   }
 
-  void updateWifiNameValidate() async {
+  updateWifiNameValidate(){
+    print("63event");
+    print(eventCeinture);
+    if(eventCeinture!='message_wifi_update_success') {
+      //Future.delayed(Duration(seconds: 1));
+      var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 10);
+      subscription = counterStream.listen((int counter) {
+        updateWifiName();
+
+        print("eventC");
+        print(eventCeinture);
+        if (eventCeinture=='message_wifi_update_success') {
+          // After 5 ticks, pause for five seconds, then resume.
+          subscription.cancel();
+          print("eventCancel");
+        }
+      });
+
+    }
+
+  }
+
+  void updateWifiName() async {
     print("mon dialog, tu as quoi==================");
 
     setState(() {

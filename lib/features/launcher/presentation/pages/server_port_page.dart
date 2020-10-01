@@ -1,6 +1,6 @@
-
-import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:async';
 import 'package:ceinture/core/utils/colors.dart';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
@@ -26,9 +26,13 @@ class PageState extends State<ServerPortPage> {
   String serverPort;
   BuildContext _buildContext;
   BuildContext _dialogContext;
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   bool isProgress = false;
   AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
   String defaultServerPort='';
+
+
   CeintureSensorRepository _ceintureSensorRepository;
   var textController = new TextEditingController();
 
@@ -36,6 +40,9 @@ class PageState extends State<ServerPortPage> {
   void initState() {
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
+      print("39event");
+      print(event);
       switch (event) {
         case 'message_command_fail':
         case 'message_server_port_update_success':
@@ -54,18 +61,36 @@ class PageState extends State<ServerPortPage> {
   }
 
 
+  updateServerPortValidate(){
+  print("63event");
+  print(eventCeinture);
+   if(eventCeinture!='message_server_port_update_success') {
+     //Future.delayed(Duration(seconds: 1));
+     var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 15);
+     subscription = counterStream.listen((int counter) {
+       updateServerPort();
+       print("eventC");
+       print(eventCeinture);
+       if (eventCeinture=='message_server_port_update_success') {
+         subscription.pause(Future.delayed(Duration(minutes: 10)));
+         subscription.cancel();
+         print("eventCancel");
+       }
+     });
+   }
+}
+  void updateServerPort() async {
 
-  void updateServerPortValidate() async {
     setState(() {
       isProgress = true;
     });
-    if (defaultServerPort != serverPort) {
+   if(defaultServerPort != serverPort)
+    {
       _appSharedPreferences.setServerPort(serverPort);
-
     }
-    if (serverPort.length <= 14) {
-      await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
-          CeintureCommand.setServerPort(serverPort), widget.isConnected);
+   if(serverPort.length <= 14){
+        await _ceintureSensorRepository.executeBleCommand(widget.device.id.id,
+            CeintureCommand.setServerPort(serverPort), widget.isConnected);
     }
   }
 
@@ -152,6 +177,7 @@ class PageState extends State<ServerPortPage> {
                     if (_formKey.currentState.validate()) {
                       //showLoaderDialog();
                       updateServerPortValidate();
+                      // updateServerPortValidate();
                     }
                     //});
                   },
@@ -203,7 +229,6 @@ class PageState extends State<ServerPortPage> {
   }
 
 }
-
 class MyTextFormField extends StatelessWidget {
   final String hintText;
   final String initialValue;
@@ -246,4 +271,5 @@ class MyTextFormField extends StatelessWidget {
       ),
     );
   }
+
 }

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:ceinture/core/utils/colors.dart';
+import 'package:ceinture/core/utils/function_utils.dart';
 import 'package:ceinture/core/utils/translations_utils.dart';
 import 'package:ceinture/features/launcher/data/repositories/centure_sensor_repository.dart';
 import 'package:ceinture/features/launcher/data/utils/ceintute_command.dart';
@@ -31,12 +33,15 @@ class _MysettingPageState  extends State<SettingPage> {
   final _formKey = GlobalKey<FormState>();
   BuildContext _buildContext;
   String _wifiName;
-
+  StreamSubscription<int> subscription;
+  String eventCeinture='message_command_fail';
   @override
   Widget build(BuildContext context) {
     _buildContext = context;
     _ceintureSensorRepository = CeintureSensorRepository(device: widget.device);
     _ceintureSensorRepository.counterObservable.listen((event) {
+      eventCeinture=event;
+
       switch (event) {
         case 'message_command_fail':
         case 'message_time_update_success':
@@ -102,37 +107,37 @@ class _MysettingPageState  extends State<SettingPage> {
                                   Container(
                                       margin: EdgeInsets.all(20),
                                       child: Text(
-                                        "Veuillez patienter...",
+                                        translationsUtils.text("wait"),
                                         style: TextStyle(fontSize: 14),
                                       )),
                                 ],
                               ))) : Container(),
                       (isConnected)
                           ? btnCommand(
-                          context, "Mettre à jour la date", updateDate)
+                          context, translationsUtils.text("update_date") , updateDate)
                           : Container(),
                       (isConnected) ? btnCommand(
-                          context, "Arreter le monitoring par defaut",
+                          context, translationsUtils.text("stop_monitoring_default"),
                           stopRealTime) : Container(),
                       (isConnected) ? btnCommand(
-                          context, "Mettre à jour le nom du WIFI",
+                          context, translationsUtils.text("update_name_wifi"),
                           updateWifiName) : Container(),
                       (isConnected) ? btnCommand(
-                          context, "Mettre à jour le mot de passe du WIFI",
+                          context,translationsUtils.text("update_wifi_password") ,
                           updateWifiPassword) : Container(),
                       (isConnected)
                           ? btnCommand(
-                          context, "Addresse IP du serveur", serverIpAddress)
+                          context, translationsUtils.text("server_ip_address"), serverIpAddress)
                           : Container(),
                       (isConnected) ? btnCommand(
-                          context, "Port du serveur", serverPort) : Container(),
+                          context, translationsUtils.text("update_server_port"), serverPort) : Container(),
                       (isConnected)
                           ? btnCommand(
-                          context, "Nom de la ceinture", deviceName)
+                          context, translationsUtils.text("update_belt_name"), deviceName)
                           : Container(),
                       (isConnected)
                           ? btnCommand(
-                          context, "Status de la ceinture", wifiStatus)
+                          context, translationsUtils.text("belt_status"), wifiStatus)
                           : Container(),
 
                     ],
@@ -154,8 +159,14 @@ class _MysettingPageState  extends State<SettingPage> {
         margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
         height: 50,
         alignment: Alignment.center,
-        color: primaryColor,
-        child: Row(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(colors: <Color>[
+              primaryColor,
+              selectMenuColor
+            ]),
+            shape: BoxShape.rectangle,
+            borderRadius:
+            BorderRadius.all(Radius.circular(15.0))),        child: Row(
           children: <Widget>[
             Expanded(
               flex: 1,
@@ -193,8 +204,28 @@ class _MysettingPageState  extends State<SettingPage> {
     );
   }
 
+  updateDate(){
+    print("63event");
+    print(eventCeinture);
+    if(eventCeinture!='message_time_update_success') {
+      //Future.delayed(Duration(seconds: 1));
+      var counterStream = FunctionUtils.timedCounter(const Duration(seconds: 1), 5);
+      subscription = counterStream.listen((int counter) {
+        updDate();
+        print("eventC");
+        print(eventCeinture);
+        if (eventCeinture=='message_time_update_success') {
+          // After 5 ticks, pause for five seconds, then resume.
+          subscription.pause(Future.delayed(const Duration(minutes: 15)));
+          subscription.cancel();
+          print("eventCancel");
+        }
+      });
 
-  void updateDate() async {
+    }
+
+  }
+  void updDate() async {
     setState(() {
       isProgress = true;
     });
